@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  @apply bg-sand text-ink antialiased;
+  background-image:
+    radial-gradient(60% 40% at 15% 0%, rgba(51, 134, 245, 0.06), transparent 60%),
+    radial-gradient(50% 35% at 90% 10%, rgba(249, 115, 22, 0.05), transparent 60%);
+}
+
+@layer components {
+  .card {
+    @apply rounded-xl2 bg-white shadow-card ring-1 ring-ink/5 transition-all duration-300 hover:shadow-lift;
+  }
+  .card-glass {
+    @apply rounded-xl2 border border-white/40 bg-white/70 shadow-card backdrop-blur-md;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-ink/70 transition-all duration-200 hover:bg-ink/5 hover:text-ink active:scale-95;
+  }
+  .btn-primary {
+    @apply inline-flex items-center gap-2 rounded-xl bg-steg-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-steg-600/25 transition-all duration-200 hover:bg-steg-700 active:scale-95;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+::-webkit-scrollbar-thumb {
+  @apply rounded-full bg-ink/15;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-ink/25;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.skeleton {
+  @apply rounded-lg;
+  background: linear-gradient(90deg, #e8edf4 25%, #f4f7fb 50%, #e8edf4 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.6s linear infinite;
+}

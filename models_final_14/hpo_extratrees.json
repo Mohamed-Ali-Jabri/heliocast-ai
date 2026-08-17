@@ -1,0 +1,14 @@
+{
+  "model": "extratrees",
+  "best_params": {
+    "n_estimators": 175,
+    "max_depth": 16,
+    "min_samples_leaf": 23,
+    "max_features": 0.759195090518222
+  },
+  "best_cv_rmse": 0.8225282074376633,
+  "n_trials": 4,
+  "n_trials_total": 4,
+  "elapsed_sec": 191.49859499931335,
+  "data_hash": "485e7a3ad340d571c4117f575012cc5f"
+}

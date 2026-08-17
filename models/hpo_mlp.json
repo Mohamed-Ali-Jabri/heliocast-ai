@@ -1,0 +1,11 @@
+{
+  "model": "mlp",
+  "best_params": {
+    "arch_idx": 1,
+    "alpha": 0.06351221010640701,
+    "learning_rate_init": 0.0029106359131330704
+  },
+  "best_cv_rmse": 1.460775747563604,
+  "n_trials": 12,
+  "elapsed_sec": 842.6562168598175
+}

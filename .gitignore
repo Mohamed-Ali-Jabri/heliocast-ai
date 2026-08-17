@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Node / React
+node_modules/
+dist/
+
+# Outils modele / logs
+catboost_info/
+logs/
+*.log
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Donnees d'entrainement (trop volumineuses pour Git / GitHub, >100 MB)
+data/
+Test_impact_temperature/
+reports/
+*.csv
+*.xlsx
+
+# Modeles historiques (seul models_final_14/final_model_bundle.joblib est livré)
+models_final/
+models_final_13/
+models_final_14/*.pkl
+models_final_14/*.joblib
+!models_final_14/final_model_bundle.joblib
+
+# Captures / docs locales
+*.png
+*.jpg
+*.jpeg
+*.docx
+*.pptx
+*.pdf
+*.ipynb

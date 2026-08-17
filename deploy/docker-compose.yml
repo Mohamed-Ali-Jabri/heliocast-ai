@@ -1,0 +1,48 @@
+# STEG HelioCast AI - orchestration Docker (MySQL + API)
+# Usage : docker compose up -d --build  puis ouvrir http://localhost:8000
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: heliocast-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root_heliocast
+      MYSQL_DATABASE: heliocast
+      MYSQL_USER: heliocast
+      MYSQL_PASSWORD: changer_moi
+      TZ: Africa/Tunis
+    ports:
+      # 3307 pour eviter un conflit avec un XAMPP local sur 3306
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot_heliocast", "--silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  api:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    container_name: heliocast-api
+    environment:
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      DB_NAME: heliocast
+      DB_USER: heliocast
+      DB_PASSWORD: changer_moi
+      MYSQL_ROOT_PASSWORD: root_heliocast
+      FORECAST_DAYS: "7"
+      TZ: Africa/Tunis
+    ports:
+      - "8000:8000"
+    volumes:
+      - api_logs:/app/logs
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+volumes:
+  mysql_data:
+  api_logs:

@@ -1,0 +1,113 @@
+sites:
+
+  - id: tozeur_1
+    name: "Tozeur 1"
+
+    location:
+      latitude: 33.90859854822346
+      longitude: 8.046303098866254
+      timezone: Africa/Tunis
+
+    installed_capacity_mwp: 10.0
+
+    pv_system:
+      mounting: fixed
+      tracker: false
+
+    data_period:
+      start_date: "2022-07-13"
+      end_date: "2026-07-12"
+
+
+  - id: tozeur_2
+    name: "Tozeur 2"
+
+    location:
+      latitude: 33.90859854822346
+      longitude: 8.046303098866254
+      timezone: Africa/Tunis
+
+    installed_capacity_mwp: 10.0
+
+    pv_system:
+      mounting: fixed
+      tracker: false
+
+    data_period:
+      start_date: "2022-07-13"
+      end_date: "2026-07-12"
+
+
+  - id: meknassi_eppm
+    name: "Meknassi (EPPM)"
+
+    location:
+      latitude: 34.60536489121733
+      longitude: 9.60224390009452
+      timezone: Africa/Tunis
+
+    installed_capacity_mwp: 10.0
+
+    pv_system:
+      mounting: fixed
+      tracker: false
+    data_period:
+      start_date: "2023-08-07"
+      end_date: "2026-07-12"
+
+
+
+  - id: elmourabitine_eni
+    name: "Elmourabitine (ENI - Tataouine)"
+
+    location:
+      latitude: 33.0502272570142
+      longitude: 10.463332301292539
+      timezone: Africa/Tunis
+
+    installed_capacity_mwp: 10.0
+
+    pv_system:
+      mounting: single_axis_tracker
+      tracker: true
+
+    data_period:
+      start_date: "2022-12-30"
+      end_date: "2026-07-12"
+
+  - id: feriana_csfb
+    name: "Feriana CSFB"
+
+    location:
+      latitude: 34.88905006548165
+      longitude: 8.552969431357354
+      timezone: Africa/Tunis
+
+    installed_capacity_mwp: 10.0
+
+    pv_system:
+      mounting: fixed
+      tracker: false
+
+    data_period:
+      start_date: "2025-04-22"
+      end_date: "2026-07-12"
+
+
+  - id: feriana_csfc
+    name: "Feriana CSFC"
+
+    location:
+      latitude: 34.88920040927399
+      longitude: 8.55338789575548
+      timezone: Africa/Tunis
+
+    installed_capacity_mwp: 10.0
+
+    pv_system:
+      mounting: fixed
+      tracker: false
+
+    data_period:
+      start_date: "2025-04-22"
+      end_date: "2026-07-12"

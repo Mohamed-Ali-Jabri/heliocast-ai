@@ -1,0 +1,16 @@
+{
+  "model": "histgb",
+  "best_params": {
+    "max_iter": 208,
+    "max_depth": 9,
+    "learning_rate": 0.01758441354811783,
+    "min_samples_leaf": 55,
+    "l2_regularization": 1.2208338797645126,
+    "max_leaf_nodes": 66
+  },
+  "best_cv_rmse": 0.8332163063513237,
+  "n_trials": 20,
+  "n_trials_total": 20,
+  "elapsed_sec": 131.9838981628418,
+  "data_hash": "485e7a3ad340d571c4117f575012cc5f"
+}

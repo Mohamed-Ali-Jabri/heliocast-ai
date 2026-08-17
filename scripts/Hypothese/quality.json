@@ -1,0 +1,128 @@
+{
+    "elmourabitine_eni": {
+        "validation_variable": "shortwave_radiation",
+        "correlation_lag": {
+            "-6h": 0.064,
+            "-5h": 0.274,
+            "-4h": 0.48,
+            "-3h": 0.665,
+            "-2h": 0.809,
+            "-1h": 0.892,
+            "0h": 0.887,
+            "+1h": 0.796,
+            "+2h": 0.648,
+            "+3h": 0.464,
+            "+4h": 0.261,
+            "+5h": 0.056,
+            "+6h": -0.136
+        },
+        "best_lag": "-1h",
+        "best_correlation": 0.892,
+        "timezone_validation": "CHECK"
+    },
+    "feriana_csfb": {
+        "validation_variable": "shortwave_radiation",
+        "correlation_lag": {
+            "-6h": 0.097,
+            "-5h": 0.305,
+            "-4h": 0.508,
+            "-3h": 0.687,
+            "-2h": 0.822,
+            "-1h": 0.895,
+            "0h": 0.884,
+            "+1h": 0.791,
+            "+2h": 0.643,
+            "+3h": 0.462,
+            "+4h": 0.265,
+            "+5h": 0.065,
+            "+6h": -0.122
+        },
+        "best_lag": "-1h",
+        "best_correlation": 0.895,
+        "timezone_validation": "CHECK"
+    },
+    "feriana_csfc": {
+        "validation_variable": "shortwave_radiation",
+        "correlation_lag": {
+            "-6h": 0.086,
+            "-5h": 0.293,
+            "-4h": 0.496,
+            "-3h": 0.676,
+            "-2h": 0.815,
+            "-1h": 0.891,
+            "0h": 0.884,
+            "+1h": 0.795,
+            "+2h": 0.649,
+            "+3h": 0.468,
+            "+4h": 0.27,
+            "+5h": 0.069,
+            "+6h": -0.12
+        },
+        "best_lag": "-1h",
+        "best_correlation": 0.891,
+        "timezone_validation": "CHECK"
+    },
+    "meknassi_eppm": {
+        "validation_variable": "shortwave_radiation",
+        "correlation_lag": {
+            "-6h": 0.03,
+            "-5h": 0.225,
+            "-4h": 0.423,
+            "-3h": 0.606,
+            "-2h": 0.754,
+            "-1h": 0.84,
+            "0h": 0.84,
+            "+1h": 0.752,
+            "+2h": 0.603,
+            "+3h": 0.421,
+            "+4h": 0.226,
+            "+5h": 0.033,
+            "+6h": -0.141
+        },
+        "best_lag": "-1h",
+        "best_correlation": 0.84,
+        "timezone_validation": "CHECK"
+    },
+    "tozeur_1": {
+        "validation_variable": "shortwave_radiation",
+        "correlation_lag": {
+            "-6h": -0.032,
+            "-5h": 0.189,
+            "-4h": 0.424,
+            "-3h": 0.647,
+            "-2h": 0.824,
+            "-1h": 0.923,
+            "0h": 0.922,
+            "+1h": 0.818,
+            "+2h": 0.638,
+            "+3h": 0.415,
+            "+4h": 0.18,
+            "+5h": -0.038,
+            "+6h": -0.223
+        },
+        "best_lag": "-1h",
+        "best_correlation": 0.923,
+        "timezone_validation": "CHECK"
+    },
+    "tozeur_2": {
+        "validation_variable": "shortwave_radiation",
+        "correlation_lag": {
+            "-6h": -0.029,
+            "-5h": 0.194,
+            "-4h": 0.43,
+            "-3h": 0.652,
+            "-2h": 0.826,
+            "-1h": 0.921,
+            "0h": 0.915,
+            "+1h": 0.807,
+            "+2h": 0.624,
+            "+3h": 0.4,
+            "+4h": 0.165,
+            "+5h": -0.053,
+            "+6h": -0.236
+        },
+        "best_lag": "-1h",
+        "best_correlation": 0.921,
+        "timezone_validation": "CHECK"
+    }
+}

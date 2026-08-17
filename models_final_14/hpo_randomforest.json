@@ -1,0 +1,15 @@
+{
+  "model": "randomforest",
+  "best_params": {
+    "n_estimators": 61,
+    "max_depth": 10,
+    "min_samples_leaf": 34,
+    "max_features": 0.5274034664069657,
+    "max_samples": 0.3727299868828402
+  },
+  "best_cv_rmse": 0.837711791469412,
+  "n_trials": 7,
+  "n_trials_total": 7,
+  "elapsed_sec": 255.12603902816772,
+  "data_hash": "485e7a3ad340d571c4117f575012cc5f"
+}

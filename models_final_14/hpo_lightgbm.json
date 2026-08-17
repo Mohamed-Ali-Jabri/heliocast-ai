@@ -1,0 +1,18 @@
+{
+  "model": "lightgbm",
+  "best_params": {
+    "max_depth": 7,
+    "num_leaves": 145,
+    "learning_rate": 0.039107547820079414,
+    "subsample": 0.9990851371537368,
+    "colsample_bytree": 0.6052561262871233,
+    "min_child_samples": 78,
+    "reg_alpha": 0.005508571077477059,
+    "reg_lambda": 0.001033949831486344
+  },
+  "best_cv_rmse": 0.8150777833131304,
+  "n_trials": 20,
+  "n_trials_total": 20,
+  "elapsed_sec": 121.49550557136536,
+  "data_hash": "485e7a3ad340d571c4117f575012cc5f"
+}

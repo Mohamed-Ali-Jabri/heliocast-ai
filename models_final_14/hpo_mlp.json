@@ -1,0 +1,13 @@
+{
+  "model": "mlp",
+  "best_params": {
+    "arch_idx": 3,
+    "alpha": 1.2087541473056957e-05,
+    "learning_rate_init": 0.008706020878304856
+  },
+  "best_cv_rmse": 1.1014504115856023,
+  "n_trials": 4,
+  "n_trials_total": 4,
+  "elapsed_sec": 201.9554660320282,
+  "data_hash": "485e7a3ad340d571c4117f575012cc5f"
+}

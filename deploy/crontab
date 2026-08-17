@@ -1,0 +1,2 @@
+# Job quotidien a 00:00 UTC (soit 01:00 heure d'hiver Tunis / 02:00 heure d'ete)
+0 0 * * * root cd /app && /usr/local/bin/python -m deploy.app.forecast_job >> /var/log/heliocast_cron.log 2>&1

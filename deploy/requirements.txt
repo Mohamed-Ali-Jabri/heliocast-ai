@@ -1,0 +1,20 @@
+# Inference + deploiement (pas d'entrainement)
+numpy>=1.26
+pandas>=2.2
+scikit-learn>=1.5
+lightgbm>=4.5
+pvlib>=0.11
+pyyaml>=6.0
+requests>=2.32
+joblib>=1.4
+matplotlib>=3.9
+
+# MySQL
+pymysql>=1.1
+
+# API
+fastapi>=0.115
+uvicorn>=0.30
+
+# Config
+python-dotenv>=1.0

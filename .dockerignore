@@ -1,0 +1,43 @@
+# STEG HelioCast AI - exclusions contexte Docker
+# (le contexte = racine projet, le Dockerfile est dans deploy/)
+
+# Git / IDE
+.git
+.gitignore
+.idea
+.vscode
+
+# Python
+__pycache__/
+*.pyc
+.venv
+venv
+env
+
+# Node / dashboard source (seul le bundle buildé dans deploy/app/static est livré)
+dashboard/node_modules
+dashboard/dist
+node_modules
+
+# Données volumineuses / non nécessaires à l'inférence
+data/
+logs/
+reports/
+Test_impact_temperature/
+*.csv
+*.log
+*.bat
+*.md
+
+# Variables locales
+.env
+.env.*
+
+# Artefacts d'entraînement (gros)
+models_final_14/*.pkl
+models_final_14/*.joblib
+!models_final_14/final_model_bundle.joblib
+
+# Seul modeling_v14.py est requis par l'inférence
+scripts/*
+!scripts/modeling_v14.py

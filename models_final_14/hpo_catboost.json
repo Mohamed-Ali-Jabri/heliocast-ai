@@ -1,0 +1,14 @@
+{
+  "model": "catboost",
+  "best_params": {
+    "depth": 9,
+    "learning_rate": 0.020589728197687916,
+    "l2_leaf_reg": 0.039829941698924086,
+    "subsample": 0.6733618039413735
+  },
+  "best_cv_rmse": 0.816645811916793,
+  "n_trials": 5,
+  "n_trials_total": 5,
+  "elapsed_sec": 182.2801604270935,
+  "data_hash": "485e7a3ad340d571c4117f575012cc5f"
+}

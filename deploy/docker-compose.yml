@@ -32,8 +32,9 @@ services:
       - sh
       - -c
       - >-
-        until mysqladmin ping -h "$$DB_HOST" -P "$$DB_PORT" -u root -p"$$MYSQL_ROOT_PASSWORD" --silent; do sleep 2; done
-        && echo "[1/3] MySQL prêt"
+        echo "[1/3] Attente de MySQL ($DB_HOST:$DB_PORT)..."
+        && until python -c "import os,pymysql; pymysql.connect(host=os.environ['DB_HOST'],port=int(os.environ['DB_PORT']),user='root',password=os.environ['MYSQL_ROOT_PASSWORD'])"; do sleep 2; done
+        && echo "[OK] MySQL prêt"
         && echo "[2/3] Génération des prévisions (job quotidien)..."
         && python -m deploy.app.forecast_job
         && echo "[3/3] Démarrage de l'API sur :8000..."

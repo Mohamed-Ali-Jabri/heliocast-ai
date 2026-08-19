@@ -26,6 +26,16 @@ services:
       context: ..
       dockerfile: deploy/Dockerfile
     container_name: heliocast-api
+    # Desactivation de l'entrypoint shell (embrouilles EOL Windows/Linux)
+    entrypoint: []
+    command: >-
+      sh -c 'until mysqladmin ping -h "$$DB_HOST" -P "$$DB_PORT" -u root -p"$$MYSQL_ROOT_PASSWORD" --silent; do sleep 2; done
+      && echo "[1/3] MySQL prêt"
+      && echo "[2/3] Génération des prévisions (job quotidien)..."
+      && python -m deploy.app.forecast_job
+      && echo "[3/3] Démarrage de l'API sur :8000..."
+      && cd /app/deploy
+      && exec python -m uvicorn app.api:app --host 0.0.0.0 --port 8000'
     environment:
       DB_HOST: mysql
       DB_PORT: "3306"

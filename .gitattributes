@@ -1,0 +1,5 @@
+# Scripts shell : toujours LF pour un executables sous Linux/Docker
+*.sh text eol=lf
+
+# Scripts Windows : CRLF (convention Windows)
+*.bat text eol=crlf

@@ -6,9 +6,10 @@ ENV PYTHONUNBUFFERED=1 \
 
 WORKDIR /app
 
-# Client MySQL (mysqladmin) pour le wait-for dans l'entrypoint
+# Client MySQL (mysqladmin) pour le wait-for dans l'entrypoint + libgomp1 (requis par LightGBM)
 RUN apt-get update && apt-get install -y --no-install-recommends \
         default-mysql-client \
+        libgomp1 \
         tzdata \
     && rm -rf /var/lib/apt/lists/*
 

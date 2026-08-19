@@ -258,11 +258,7 @@ def load_raw_data() -> pd.DataFrame:
 
 def load_quality_signal() -> pd.DataFrame | None:
     """
-    Charge les indicateurs de qualité SCADA.
-
-    Optionnel : si les colonnes n_valid_minutes / production_mw_std
-    sont absentes, le signal est ignoré avec un avertissement explicite
-    (ne jamais faire échouer le pipeline en silence).
+    (Optionnel)
     """
 
     if not QUALITY_PATH.exists():
@@ -300,9 +296,9 @@ def load_quality_signal() -> pd.DataFrame | None:
     return quality[required].copy()
 
 
-# ============================================================================
+# 
 # 7. CONTROLE TIMESTAMP
-# ============================================================================
+# 
 
 def validate_timestamps(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -359,9 +355,6 @@ def reindex_and_interpolate(
     """
     Crée une grille horaire complète par site.
 
-    - production_mw n'est JAMAIS interpolée ;
-    - seules les variables météo sont interpolées (max 3h) ;
-    - aucun décalage temporel.
     """
 
     frames = []

@@ -1,6 +1,5 @@
 """
-STEG HelioCast AI - config du deploiement (batch + API).
-Lit tout depuis les variables d'environnement (.env supporte).
+STEG HelioCast AI - config du deploiement .
 """
 from __future__ import annotations
 

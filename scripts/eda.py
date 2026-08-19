@@ -1,14 +1,6 @@
 """
 STEG HelioCast AI - Analyse Exploratoire des Données (EDA).
 =============================================================
-
-Genere une serie de graphiques dans figures/eda/ pour comprendre
-les donnees AVANT de les modeliser.
-
-Entree  : data/merged/GLOBAL/merged_all_sites.csv
-Sorties : figures/eda/*.png
-
-Usage : python scripts/eda.py
 """
 from __future__ import annotations
 

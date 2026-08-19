@@ -1,10 +1,10 @@
 const num = (v) => (Number.isFinite(Number(v)) ? Number(v) : 0)
 
 export const fmtMw = (v) =>
-  `${num(v).toLocaleString('fr-FR', { maximumFractionDigits: 1 })} MW`
+  `${num(v).toLocaleString('fr-FR', { maximumFractionDigits: 1 })} MWh`
 
 export const fmtMwh = (v) =>
-  `${num(v).toLocaleString('fr-FR', { maximumFractionDigits: 1 })} MW`
+  `${num(v).toLocaleString('fr-FR', { maximumFractionDigits: 1 })} MWh`
 
 export const fmtHour = (h) => `${String(h).padStart(2, '0')}h`
 

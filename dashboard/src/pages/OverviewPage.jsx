@@ -1,13 +1,14 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  ReferenceLine, ReferenceDot,
 } from 'recharts'
 import StatCard from '../components/StatCard'
 import WeatherIcon from '../components/WeatherIcon'
 import ChartTooltip from '../components/ChartTooltip'
 import AnimatedNumber from '../components/AnimatedNumber'
 import { datesOf, hourlyForDay, siteTotalsForDay, daySummaries } from '../utils/forecastMath'
-import { SITES, TOTAL_CAPACITY, DAYLIGHT_HOURS } from '../config/sites'
+import { SITES } from '../config/sites'
 import { useActivations } from '../context/ActivationsContext'
 import { fmtMwh, fmtMw, fmtHour, fmtDateLong } from '../utils/format'
 
@@ -17,6 +18,7 @@ export default function OverviewPage({ rows }) {
   const dates = useMemo(() => datesOf(rows), [rows])
   const today = dates[0]
   const tomorrow = dates[1]
+  const [showPeak, setShowPeak] = useState(false)
 
   const todayTotals = useMemo(() => siteTotalsForDay(rows, today), [rows, today])
   const tomorrowTotals = useMemo(() => siteTotalsForDay(rows, tomorrow), [rows, tomorrow])
@@ -33,8 +35,6 @@ export default function OverviewPage({ rows }) {
       }).sort((a, b) => b.total - a.total),
     [rows, today, factors]
   )
-
-  const peakHourRatio = (todaySummary?.peak ?? 0) / (activeCapacity || 1)
 
   return (
     <div className="space-y-6">
@@ -55,8 +55,17 @@ export default function OverviewPage({ rows }) {
                 <AnimatedNumber value={todayTotals.total} format={fmtMwh} />
               </p>
               <p className="mt-1 text-sm font-medium text-ink/55">
-                Pic estimé à {fmtHour(todaySummary?.peakHour ?? 12)} ·{' '}
-                <AnimatedNumber value={todayTotals.peak} format={fmtMw} />
+                <button
+                  type="button"
+                  onClick={() => setShowPeak((v) => !v)}
+                  className={`cursor-pointer rounded-lg px-2 py-0.5 font-medium transition-all duration-200 ${
+                    showPeak ? 'bg-orange-100 text-orange-600 ring-1 ring-orange-300' : 'hover:bg-ink/5 hover:text-ink/80'
+                  }`}
+                  title="Cliquer pour afficher le pic sur la courbe"
+                >
+                  Pic estimé à {fmtHour(todaySummary?.peakHour ?? 12)} ·{' '}
+                  <AnimatedNumber value={todayTotals.peak} format={fmtMw} />
+                </button>
               </p>
             </div>
           </div>
@@ -99,7 +108,7 @@ export default function OverviewPage({ rows }) {
           value={todaySummary?.peakHour ?? 12}
           format={(v) => fmtHour(Math.round(v))}
           accent="green"
-          sub="Moment de production maximale"
+          sub={`Pic ${fmtMw(todaySummary?.peak ?? 0)} — Moment de production maximale`}
           icon={
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <path d="M13 2 4.5 13.5H11L9.5 22 19 10h-6.5L13 2z" />
@@ -154,6 +163,31 @@ export default function OverviewPage({ rows }) {
                 animationDuration={1400}
                 activeDot={{ r: 5, strokeWidth: 2, stroke: '#fff' }}
               />
+              {showPeak && todaySummary && hourly[todaySummary.peakHour] && (
+                <>
+                  <ReferenceLine
+                    x={hourly[todaySummary.peakHour].label}
+                    stroke="#f97316"
+                    strokeDasharray="4 4"
+                    strokeWidth={1.5}
+                  />
+                  <ReferenceDot
+                    x={hourly[todaySummary.peakHour].label}
+                    y={hourly[todaySummary.peakHour].mw}
+                    r={6}
+                    fill="#f97316"
+                    stroke="#fff"
+                    strokeWidth={2}
+                    label={{
+                      value: `Pic ${fmtMw(hourly[todaySummary.peakHour].mw)}`,
+                      position: 'top',
+                      fill: '#f97316',
+                      fontSize: 12,
+                      fontWeight: 700,
+                    }}
+                  />
+                </>
+              )}
             </AreaChart>
           </ResponsiveContainer>
         </div>
@@ -190,10 +224,6 @@ export default function OverviewPage({ rows }) {
           </div>
         </div>
       </section>
-
-      <p className="text-center text-xs font-medium text-ink/40">
-        Horizon couvert : {dates.length} jours · {dates.length * 24} heures de prévision · {fmtMw(activeCapacity)} / {TOTAL_CAPACITY} MW actifs sur {DAYLIGHT_HOURS} h utiles
-      </p>
     </div>
   )
 }

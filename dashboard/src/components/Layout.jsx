@@ -94,7 +94,7 @@ export default function Layout({ children, generatedAt = null, onRefresh = null 
         <header className="sticky top-0 z-20 flex items-center justify-between gap-4 border-b border-ink/5 bg-white/70 px-6 py-4 backdrop-blur-md">
           <div>
             <p className="text-xl font-extrabold tracking-tight text-ink">
-              Centre de contrôle solaire
+              Supervision photovoltaïque
             </p>
             <p className="text-xs font-medium capitalize text-ink/50">
               {now.toLocaleDateString('fr-FR', {

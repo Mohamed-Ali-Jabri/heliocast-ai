@@ -8,7 +8,7 @@ const CARD = {
   boxShadow: '0 14px 34px -8px rgba(15,31,56,0.4)',
 }
 
-export default function ChartTooltip({ active, payload = [], label, unit = 'MW' }) {
+export default function ChartTooltip({ active, payload = [], label, unit = 'MWh' }) {
   if (!active || !payload?.length) return null
   return (
     <div style={CARD}>

@@ -8,7 +8,7 @@ import { useForecasts } from './hooks/useForecasts'
 import { ActivationsProvider, useActivations } from './context/ActivationsContext'
 import { FullScreenLoading, ErrorState } from './components/LoadingState'
 
-function RoutedApp({ rows }) {
+function RoutedApp({ rows, rawData, generatedAt }) {
   const { factors } = useActivations()
 
   const scaledRows = useMemo(
@@ -23,7 +23,7 @@ function RoutedApp({ rows }) {
   return (
     <Routes>
       <Route path="/" element={<OverviewPage rows={scaledRows} />} />
-      <Route path="/previsions" element={<ForecastPage rows={scaledRows} />} />
+      <Route path="/previsions" element={<ForecastPage rows={scaledRows} rawData={rawData} generatedAt={generatedAt} />} />
       <Route path="/centrales" element={<ActivationsPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
@@ -44,7 +44,7 @@ export default function App() {
     <HashRouter>
       <ActivationsProvider>
         <Layout generatedAt={generatedAt} onRefresh={reload}>
-          <RoutedApp rows={rows} />
+          <RoutedApp rows={rows} rawData={meta?.data ?? []} generatedAt={generatedAt} />
         </Layout>
       </ActivationsProvider>
     </HashRouter>

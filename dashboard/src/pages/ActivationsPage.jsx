@@ -20,7 +20,7 @@ export default function ActivationsPage() {
           </div>
           <div className="flex items-center gap-2">
             <span className="chip bg-steg-50 text-steg-700">
-              {fmtMw(activeCapacity)} / {TOTAL_CAPACITY} MW actifs
+              {fmtMw(activeCapacity)} / {TOTAL_CAPACITY} MWh actifs
             </span>
             <button onClick={() => setAll(100)} className="btn-ghost !px-3 !py-1.5 text-xs">
               Tout ON
@@ -59,7 +59,7 @@ export default function ActivationsPage() {
                       {s.name} <span className="text-[11px] font-medium text-ink/40">{s.city}</span>
                     </p>
                     <p className="text-[11px] font-medium text-ink/45">
-                      {s.capacity} MW → {fmtMw(active)} actifs
+                      {s.capacity} MWh → {fmtMw(active)} actifs
                     </p>
                   </div>
                 </div>

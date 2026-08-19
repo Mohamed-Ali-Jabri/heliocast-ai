@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react'
+import * as XLSX from 'xlsx'
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  BarChart, Bar, Legend,
+  BarChart, Bar, Legend, ReferenceLine, ReferenceDot,
 } from 'recharts'
 import ChartTooltip from '../components/ChartTooltip'
 import WeekCalendar from '../components/WeekCalendar'
@@ -12,18 +13,24 @@ import { fmtMwh, fmtDayNum, fmtHour, fmtMw } from '../utils/format'
 
 const ALL_SITES = 'all'
 
-export default function ForecastPage({ rows }) {
+export default function ForecastPage({ rows, rawData = [], generatedAt }) {
   const { factors, activeCapacity, activeSites } = useActivations()
   const dates = useMemo(() => datesOf(rows), [rows])
   const [siteId, setSiteId] = useState(ALL_SITES)
   const [mode, setMode] = useState('jour') // jour | demain | semaine
   const [selectedDate, setSelectedDate] = useState(dates[0])
+  const [showPeak, setShowPeak] = useState(false)
 
   const summaries = useMemo(() => daySummaries(rows), [rows])
 
   const focusDate = mode === 'semaine' ? null : mode === 'demain' ? dates[1] : selectedDate
 
   const hourly = useMemo(() => hourData(rows, focusDate, siteId), [rows, focusDate, siteId])
+
+  const peakInfo = useMemo(() => {
+    if (!hourly.length) return null
+    return hourly.reduce((best, h) => (h.mw > best.mw ? h : best), hourly[0])
+  }, [hourly])
 
   const dailyAll = useMemo(
     () =>
@@ -55,6 +62,55 @@ export default function ForecastPage({ rows }) {
     [tomorrowPerSite, siteId]
   )
 
+  const reduced = summaries.reduce((a, s) => a + s.total, 0)
+
+  const downloadXlsx = () => {
+    const info = (id) => SITES.find((s) => s.id === id)
+    const lines = rawData
+      .map((d) => {
+        const site = info(d.site_id)
+        return {
+          'Timestamp': d.timestamp,
+          'Jour': d.timestamp.slice(0, 10),
+          'Heure': d.timestamp.slice(11, 13),
+          'Centrale': site?.name ?? d.site_id,
+          'Production predite (MW)': d.prediction_mw,
+        }
+      })
+      .sort((a, b) =>
+        a.Centrale === b.Centrale
+          ? a.Timestamp.localeCompare(b.Timestamp)
+          : a.Centrale.localeCompare(b.Centrale)
+      )
+
+    const ws = XLSX.utils.json_to_sheet(lines)
+    ws['!cols'] = [
+      { wch: 18 }, { wch: 12 }, { wch: 6 },
+      { wch: 22 }, { wch: 20 },
+    ]
+
+    const days = [...new Set(rawData.map((d) => d.timestamp.slice(0, 10)))]
+    const sites = [...new Set(rawData.map((d) => d.site_id))]
+    const infoSheet = XLSX.utils.aoa_to_sheet([
+      ['STEG HelioCast — Supervision photovoltaïque'],
+      ['Export des previsions de production'],
+      [],
+      ['Generation des donnees', generatedAt ?? ''],
+      ['Export effectue le', new Date().toLocaleString('fr-FR')],
+      ['Horizon (jours)', days.length],
+      ['Centrales', sites.length],
+      ['Lignes exportees', lines.length],
+    ])
+    infoSheet['!cols'] = [{ wch: 26 }, { wch: 30 }]
+
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, 'Previsions')
+    XLSX.utils.book_append_sheet(wb, infoSheet, 'Informations')
+
+    const stamp = (generatedAt ?? new Date().toISOString()).slice(0, 10)
+    XLSX.writeFile(wb, `previsions_heliocast_${stamp}.xlsx`)
+  }
+
   return (
     <div className="space-y-6">
       <section className="card p-6 animate-fade-up">
@@ -65,10 +121,23 @@ export default function ForecastPage({ rows }) {
               Horizon J+1 → J+7 — {dates.length} jours de prévision horaire
             </p>
           </div>
-          <div>
+          <div className="flex items-center gap-2">
             <span className="chip bg-energy-50 text-energy-600 ring-1 ring-energy-200">
-              ⚡ {fmtMwh(summaries.reduce((a, s) => a + s.total, 0))} sur l’horizon
+              ⚡ {fmtMwh(reduced)} sur l’horizon
             </span>
+            <button
+              type="button"
+              onClick={downloadXlsx}
+              className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white shadow-md shadow-emerald-600/25 transition-all duration-200 hover:bg-emerald-700"
+              title="Télécharger toutes les prévisions au format Excel"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              Télécharger Excel
+            </button>
           </div>
         </div>
 
@@ -142,9 +211,18 @@ export default function ForecastPage({ rows }) {
                 {fmtMwh(hourly.reduce((a, h) => a + h.mw, 0))}
               </p>
             </div>
-            <span className="chip bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100">
-              Pic à {fmtHour(hourly.reduce((best, h) => (h.mw > best.mw ? h : best), hourly[0])?.hour ?? 12)}
-            </span>
+            <button
+              type="button"
+              onClick={() => setShowPeak((v) => !v)}
+              className={`cursor-pointer rounded-full px-3 py-1 text-xs font-bold ring-1 transition-all duration-200 ${
+                showPeak
+                  ? 'bg-emerald-100 text-emerald-700 ring-emerald-300'
+                  : 'bg-emerald-50 text-emerald-700 ring-emerald-100 hover:ring-emerald-300'
+              }`}
+              title="Cliquer pour afficher le pic sur la courbe"
+            >
+              Pic à {fmtHour(peakInfo?.hour ?? 12)}
+            </button>
           </div>
           <ResponsiveContainer width="100%" height={340}>
             <AreaChart key={`${siteId}-${focusDate}`} data={hourly} margin={{ top: 6, right: 8, left: -12, bottom: 0 }}>
@@ -168,6 +246,26 @@ export default function ForecastPage({ rows }) {
                 animationDuration={1300}
                 activeDot={{ r: 5, strokeWidth: 2, stroke: '#fff' }}
               />
+              {showPeak && peakInfo && (
+                <>
+                  <ReferenceLine x={peakInfo.label} stroke="#10b981" strokeDasharray="4 4" strokeWidth={1.5} />
+                  <ReferenceDot
+                    x={peakInfo.label}
+                    y={peakInfo.mw}
+                    r={6}
+                    fill="#10b981"
+                    stroke="#fff"
+                    strokeWidth={2}
+                    label={{
+                      value: `Pic ${fmtMw(peakInfo.mw)}`,
+                      position: 'top',
+                      fill: '#10b981',
+                      fontSize: 12,
+                      fontWeight: 700,
+                    }}
+                  />
+                </>
+              )}
             </AreaChart>
           </ResponsiveContainer>
         </section>
@@ -255,13 +353,13 @@ export default function ForecastPage({ rows }) {
         <section className="space-y-4">
           <div className="card p-6 animate-fade-up" style={{ animationDelay: '100ms' }}>
             <h2 className="text-base font-extrabold text-ink">Comparaison quotidienne</h2>
-            <p className="text-xs font-medium text-ink/50">Production attendue par jour (MW)</p>
+            <p className="text-xs font-medium text-ink/50">Production attendue par jour (MWh)</p>
             <ResponsiveContainer width="100%" height={320}>
               <BarChart data={dailyAll} margin={{ top: 6, right: 8, left: -8, bottom: 0 }} barCategoryGap="30%">
                 <CartesianGrid strokeDasharray="3 6" stroke="#e4eaf3" vertical={false} />
                 <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#7c8aa0' }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 11, fill: '#7c8aa0' }} axisLine={false} tickLine={false} />
-                <Tooltip content={<ChartTooltip unit="MW" />} cursor={{ fill: 'rgba(51,134,245,0.06)' }} />
+                <Tooltip content={<ChartTooltip unit="MWh" />} cursor={{ fill: 'rgba(51,134,245,0.06)' }} />
                 <Legend wrapperStyle={{ fontSize: 11, fontWeight: 600 }} />
                 {SITES.map((s) => (
                   <Bar key={s.id} dataKey={s.id} name={s.name} stackId="a" fill={s.color} radius={[3, 3, 0, 0]} animationDuration={1200} />
@@ -283,12 +381,9 @@ export default function ForecastPage({ rows }) {
       <div className="card p-5 animate-fade-up" style={{ animationDelay: '220ms' }}>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm font-semibold text-ink/60">
-            Capacité installée totale : <span className="font-extrabold text-ink">{TOTAL_CAPACITY} MW</span> ·{' '}
+            Capacité installée totale : <span className="font-extrabold text-ink">{TOTAL_CAPACITY} MWh</span> ·{' '}
             <span className="font-extrabold text-steg-700">{fmtMw(activeCapacity)} actifs</span> ·{' '}
             {activeSites} / {SITES.length} centrales en service
-          </p>
-          <p className="text-xs font-medium text-ink/40">
-            Données de prévision — mise à jour quotidienne
           </p>
         </div>
       </div>

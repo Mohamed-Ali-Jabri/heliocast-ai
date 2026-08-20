@@ -2,8 +2,6 @@ import { SITES, TOTAL_CAPACITY } from '../config/sites'
 import { useActivations } from '../context/ActivationsContext'
 import { fmtMw } from '../utils/format'
 
-const PRESETS = [0, 25, 50, 75, 100]
-
 export default function ActivationsPage() {
   const { factors, setFactor, toggle, setAll, activeCapacity, activeSites } = useActivations()
 
@@ -64,19 +62,20 @@ export default function ActivationsPage() {
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2">
-                  <div className="flex rounded-xl bg-ink/5 p-1">
-                    {PRESETS.map((p) => (
-                      <button
-                        key={p}
-                        onClick={() => setFactor(s.id, p)}
-                        className={`rounded-lg px-2.5 py-1 text-[11px] font-bold transition-all duration-200 ${
-                          factor === p ? 'bg-white text-steg-700 shadow-card' : 'text-ink/50 hover:text-ink'
-                        }`}
-                      >
-                        {p === 0 ? 'Off' : p === 100 ? 'On' : `${p} %`}
-                      </button>
-                    ))}
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="flex items-center gap-3">
+                    <span className="w-14 text-right text-xs font-bold text-ink/60">{factor} %</span>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      step="1"
+                      value={factor}
+                      onChange={(e) => setFactor(s.id, Number(e.target.value))}
+                      aria-label={`Capacité ${s.name}`}
+                      className="h-2 w-40 cursor-pointer appearance-none rounded-full bg-ink/10 accent-emerald-600"
+                      title={`Capacité de ${s.name} : ${factor} %`}
+                    />
                   </div>
                   <button
                     onClick={() => toggle(s.id)}

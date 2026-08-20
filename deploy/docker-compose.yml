@@ -57,6 +57,18 @@ services:
       mysql:
         condition: service_healthy
 
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: heliocast-phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: "3306"
+    ports:
+      - "8085:80"
+    depends_on:
+      mysql:
+        condition: service_healthy
+
 volumes:
   mysql_data:
   api_logs:

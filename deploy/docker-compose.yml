@@ -7,8 +7,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root_heliocast
       MYSQL_DATABASE: heliocast
-      MYSQL_USER: heliocast
-      MYSQL_PASSWORD: changer_moi
+      MYSQL_USER: steg
+      MYSQL_PASSWORD: steg
       TZ: Africa/Tunis
     ports:
       # 3307 pour eviter un conflit avec un XAMPP local sur 3306
@@ -44,8 +44,8 @@ services:
       DB_HOST: mysql
       DB_PORT: "3306"
       DB_NAME: heliocast
-      DB_USER: heliocast
-      DB_PASSWORD: changer_moi
+      DB_USER: steg
+      DB_PASSWORD: steg
       MYSQL_ROOT_PASSWORD: root_heliocast
       FORECAST_DAYS: "7"
       TZ: Africa/Tunis

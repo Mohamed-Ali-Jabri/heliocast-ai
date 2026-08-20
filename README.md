@@ -111,7 +111,7 @@ flowchart LR
         P2 --> P3["Inférence LightGBM<br/>6 sites × 168 h = 1008 points"]
         P3 --> P4["MySQL (table forecasts)"]
         P4 --> P5["FastAPI (127.0.0.1:8000)"]
-        P5 --> P6["Dashboard React (2 pages)"]
+        P5 --> P6["Dashboard React (3 pages)"]
     end
 
     T4 -. "bundle" .-> P3
@@ -406,16 +406,17 @@ Test déterministe (`Test_impact_temperature/`) — Tozeur 1, GHI fixe à 950 W/
 
 ```mermaid
 flowchart TB
-    subgraph HOTE["Machine hôte (Windows)"]
+    subgraph HOTE["Machine hôte (Windows ou PC serveur Docker)"]
         SCH["Tâche planifiée<br/>job nocturne 00:05"] --> JOB["forecast_job.py"]
         JOB --> OM["Open-Meteo Forecast API<br/>14 variables, Africa/Tunis"]
         OM --> EXP["Inférence LightGBM v14<br/>bundle .joblib 4.9 Mo"]
-        EXP --> DB[("MySQL<br/>table forecasts")]
-        API["FastAPI Uvicorn :8000<br/>/health · /model/meta · /forecasts/latest"] --> DB
-        API --> STAT["Dashboard statique React<br/>deploy/app/static"]
+        EXP --> DB[("MySQL 8<br/>table forecasts")]
+        API["FastAPI Uvicorn :8000<br/>/health · /model/meta · /forecasts/latest · /forecasts/refresh"] --> DB
+        API --> STAT["Dashboard statique React<br/>deploy/app/static (3 pages)"]
         NAV["Exploitant (navigateur)"] --> API
     end
     DEM["demarrer_site.bat<br/>1 clic : MySQL + API + navigateur"] -.-> HOTE
+    DKR["demarrer_docker.bat<br/>1 clic : docker compose up (image paquetée)"] -.-> HOTE
 ```
 
 ### 11.2 Brique par brique
@@ -423,12 +424,12 @@ flowchart TB
 | Brique | Technologie | Rôle |
 |---|---|---|
 | **Job batch** | Python (pandas + LightGBM), 1 exécution/jour | Récupère la météo 7 jours, prédit 1008 points (6 sites × 168 h), écrit en MySQL (~3 s) |
-| **Base** | **MySQL 8** (XAMPP), table `forecasts` | Historique des vagues de prévision, upsert par clé `(site_id, timestamp, generated_at)` |
-| **API** | **FastAPI + Uvicorn** (port 8000) | Sert le dernier lot + métadonnées du modèle + l'état de santé (ping MySQL) |
-| **Dashboard** | **React + Vite + Tailwind + Recharts**, build statique dans `deploy/app/static/` | 2 pages : *Vue d'ensemble* et *Prévisions* (sélecteur centrale/date, profils horaires, agrégats MWh, % capacité) |
+| **Base** | **MySQL 8** (XAMPP local ou conteneur Docker), table `forecasts` | Historique des vagues de prévision, upsert par clé `(site_id, timestamp, generated_at)` |
+| **API** | **FastAPI + Uvicorn** (port 8000) | Sert le dernier lot + métadonnées du modèle + l'état de santé (ping MySQL) + rafraîchissement à la demande |
+| **Dashboard** | **React + Vite + Tailwind + Recharts**, build statique dans `deploy/app/static/` | 3 pages : *Vue d'ensemble*, *Prévisions* (sélecteur centrale/date, profils horaires, agrégats MWh, % capacité) et *Centrales* (activation/désactivation et réglage de capacité 0-100 % par slider, tout mis à jour en direct) |
 | **Scheduler** | Windows Task Scheduler (`deploy/schedule_windows.ps1`) ou `crontab` | Relance automatique à 00:05 |
-| **Conteneurs (option)** | `deploy/Dockerfile` + `docker-compose.yml` | API + MySQL packagés (déploiement serveur propre) |
-| **Lanceur** | `demarrer_site.bat` | Démarrage 1 clic : MySQL si absent → API → navigateur |
+| **Conteneurs (option)** | `deploy/Dockerfile` + `docker-compose.yml` | 2 services (`mysql 8.0` sur port 3307 + `api` sur port 8000), job exécuté au démarrage du conteneur |
+| **Lanceurs** | `demarrer_site.bat` (XAMPP local) / `demarrer_docker.bat` (Docker) | Démarrage 1 clic : MySQL si absent → API → navigateur |
 
 ### 11.3 API publique
 
@@ -437,6 +438,7 @@ flowchart TB
 | `GET /health` | `{"status":"ok","model_version":"v14","model":"lightgbm","database":"ok","sites":6}` |
 | `GET /model/meta` | Métadonnées du bundle : capacité, features, métriques holdout, data_hash |
 | `GET /forecasts/latest` | Dernier lot : `generated_at`, 7 jours, 6 sites, 1008 points `{site_id, timestamp, prediction_mw}` |
+| `POST /forecasts/refresh` | Génère **une nouvelle vague** à la demande et supprime les anciennes (`replace=True`) — utilisé par le bouton « Nouvelle prévision » du dashboard |
 
 ### 11.4 Schéma de base
 
@@ -468,20 +470,22 @@ project/
 │   └── final_data/                #   → datasets de modélisation
 ├── deploy/                        # Système de production
 │   ├── app/
-│   │   ├── api.py                 #   → FastAPI (3 endpoints)
+│   │   ├── api.py                 #   → FastAPI (4 endpoints, sert le dashboard)
 │   │   ├── db.py                  #   → accès MySQL (schéma, upsert, lecture)
 │   │   ├── config.py              #   → configuration .env
 │   │   ├── forecast_job.py        #   → job quotidien (météo → modèle → MySQL)
 │   │   └── static/                #   → build du dashboard (servi par l'API)
 │   ├── requirements.txt           #   → dépendances d'inférence/déploiement
-│   ├── Dockerfile                 #   → image API
-│   ├── docker-compose.yml         #   → API + MySQL conteneurisés
+│   ├── Dockerfile                 #   → image API (inclut libgomp1 pour LightGBM)
+│   ├── docker-compose.yml         #   → MySQL 8 (port 3307) + API (port 8000)
+│   ├── .env.example               #   → variables d'environnement (copier en .env)
 │   ├── schedule_windows.ps1       #   → création de la tâche planifiée Windows
 │   └── crontab                    #   → équivalent Linux
 ├── dashboard/                     # Code source du dashboard (React/Vite/Tailwind)
 │   └── src/
-│       ├── pages/                 #   → OverviewPage, ForecastPage
+│       ├── pages/                 #   → OverviewPage, ForecastPage, ActivationsPage
 │       ├── components/            #   → Layout, StatCard, charts, WeatherIcon…
+│       ├── context/               #   → ActivationsContext (facteurs 0-100 % par site)
 │       ├── api/ hooks/ utils/     #   → client API, hooks, maths de prévision, formats
 ├── modeling/                      # Notebooks + interface d'inférence
 │   ├── Model/....ipynb            #   → notebooks de modélisation (v1…v14)
@@ -504,7 +508,8 @@ project/
 ├── reports/                       # Rapports CSV systématiques v14
 ├── Test_impact_temperature/       # Validation physique (sensibilité T et GHI)
 ├── ERA5 historical weather/       # Script ERA5 (placeholder : clé CDS requise)
-├── demarrer_site.bat              # Démarrage 1 clic (MySQL + API + navigateur)
+├── demarrer_site.bat              # Démarrage 1 clic en local (MySQL XAMPP + API + navigateur)
+├── demarrer_docker.bat            # Démarrage 1 clic avec Docker (build + conteneurs + navigateur)
 └── README.md                      # Ce document
 ```
 
@@ -517,9 +522,10 @@ project/
 | Composant | Version testée | Rôle |
 |---|---|---|
 | Python | 3.10+ (3.14 en développement) | Job + API + modélisation |
-| MySQL | 8.x (XAMPP) | Stockage des prévisions |
+| MySQL | 8.x (XAMPP ou conteneur Docker) | Stockage des prévisions |
 | Node.js + npm | 20+ | Build du dashboard |
 | Navigateur | Chrome/Edge/Firefox | Visualisation |
+| Docker Desktop *(optionnel)* | 29.x + Compose v5 | Déploiement tout-en-un (`demarrer_docker.bat`) |
 
 ### 13.2 Environnement Python
 
@@ -590,6 +596,26 @@ Détecte MySQL et l'API, démarre ce qui manque, puis ouvre http://127.0.0.1:800
 | Planifier le job nocturne (Windows) | `powershell -ExecutionPolicy Bypass -File deploy/schedule_windows.ps1` |
 
 > Le job journalier est **idempotent** et rapide (~3 s pour 1008 points) : aucune peur à le relancer manuellement.
+
+### 14.3 Démarrage Docker (PC serveur)
+
+```bash
+./demarrer_docker.bat          # équivalent : docker compose -f deploy/docker-compose.yml up -d --build
+```
+
+- 2 services : `mysql` (MySQL 8.0, port hôte **3307** pour éviter tout conflit XAMPP sur 3306) et `api` (port **8000**) — **pas de conteneur `batch` séparé** : le job quotidien (`forecast_job`) est exécuté au démarrage du conteneur `api`.
+- Volume nommé `mysql_data` : les prévisions survivent à `docker compose down`.
+- Premier démarrage lent sur machine modeste (init InnoDB : ~4,5 min MySQL, souvent 2 h au tout premier `up`) : inoffensif, le conteneur `api` attend MySQL (`service_healthy`).
+
+| Action Docker | Commande |
+|---|---|
+| Démarrage + build | `docker compose -f deploy/docker-compose.yml up -d --build` |
+| Reconstruire l'API après un `git pull` | `docker compose -f deploy/docker-compose.yml up -d --build api` |
+| Relancer le job à la main | `docker exec heliocast-api python -m deploy.app.forecast_job` |
+| Logs | `docker compose -f deploy/docker-compose.yml logs -f api` |
+| Arrêt | `docker compose -f deploy/docker-compose.yml down` |
+
+> Validation croisée (PC 2, juin 2026) : image `python:3.12-slim` + `libgomp1` requis pour LightGBM ; l'entrypoint shell du conteneur est désactivé (`entrypoint: []`) au profit d'une commande inline `sh -c` (robustesse face aux EOL Windows) ; l'image contient toujours le dernier build du dashboard (reconstruire l'API après chaque modification du code).
 
 ---
 
